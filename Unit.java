@@ -1,108 +1,146 @@
-package MUD게임;
-import java.util.ArrayList;
 
-class Unit {
-    protected int hp;
-//    체력 변수
-    protected int totalHp;
-//    총 체력 변수
-    protected int power;
-//    공격력 변수
-    protected ArrayList<String> cards;
-//    카드를 어레이리스트로 구현
-
-//    생성자
-    public Unit(int totalHp, int power) {
-        this.totalHp = totalHp;
-        this.hp = totalHp;
-        this.power = power;
-        this.cards = new ArrayList<String>();
-    }
-
-    public boolean attacked(boolean isBlackjack, Unit unit) {
-//    	공격받는 함수
-        if (isBlackjack) {
-//        	블랙잭일때
-            System.out.println("블랙잭");
-            hp -= (unit.power * 2);
-//            2배로 공격받음
-        } else {
-            hp -= unit.power;
-        }
-        if (hp <=0) {
-//        	게임이 끝난경우
-            return false;
-        }
-        return true;
-    }
-
-//    hp반환 함수
-    public int getHp() {
-        return hp;
-    }
-//    총hp 반환 함수
-    public int getTotalHp() {
-        return totalHp;
-    }
-//    카드 반환 함수
-    public ArrayList<String> getCards() {
-        return cards;
-    }
-//    카드 스코어 계산 함수
-    public int getCardScore() {
-        int score = 0;
-//      점수 초기화
-        boolean existA=false;
-//      A존재여부
-        
-        for (int i = 0; i < cards.size(); i++) {
-//        	가진카드 개수크기동안
-            String cardNumber = cards.get(i).substring(1);
-            if (cardNumber.equals("J") || cardNumber.equals("Q") || cardNumber.equals("K")) {
-//             카드가 J,Q,K일때
-            	score += 10;
-            } else if (cardNumber.equals("A")) {
-//            	카드가 A일때
-                score += 11;
-                existA = true;
-//              A가 존재함
-                
-            } else {
-                score += Integer.parseInt(cardNumber);
-//                정수로 변환후 스코어에 더해줌
-            }
-        }
-    	if(existA && score>21) {
-//    		A가 존재하면서 버스트인경우
-    		score -=10;
-//    		A를 1로 처리
-    		
-    	}
-    	
-    		
-        return score;
-    }
-
-}
-// 유닛을 상속하는 Player와 Boss 클래스
-class Player extends Unit{
-//	생성자
-    public Player(int totalHp, int power) {
-        super(totalHp, power);
-    }
-
-//    총 체력을 증가시키는 함수
-    public void addTotalHp(int plusHp) {
-        totalHp+=plusHp;
-        hp = totalHp;
-//       체력도 같이 늘려줌
-    }
+abstract class Unit {
+//	추상 클래스 생성
+	abstract boolean killUnit();
+	abstract void printUnitInfo();
+	abstract void printUnitPopulation();
+//	상속될 클래스들에서 재정의될 메소드들
 }
 
-class Boss extends Unit{
-//	생성자
-    public Boss(int totalHp, int power) {
-        super(totalHp, power);
-    }
+class SCV extends Unit{
+//	유닛을 상속받은 클래스
+	public static final String UNIT_NAME = "SCV";
+	public static final int HP = 60;
+	public static final int POWER = 5;
+	public static final int DEFENSE = 0;
+	public static final int POPULATION = 1;
+//	scv정보들
+	public static int count = 0;
+//	개수를 세는 카운트
+	public boolean killUnit() {
+//		유닛 제거 메소드
+		if(count == 0) {
+//			scv가 없을 때
+			System.out.println("삭제할"+UNIT_NAME+"가(이) 유닛이 없습니다.");
+			return false;
+		}
+		count--;
+//		scv 개수 줄여줌
+		BuildingInformation.addCurrentPopulation(-POPULATION);
+//		인구수 줄여주기
+		System.out.println(UNIT_NAME+"가(이) 죽었습니다.");
+//		출력
+		return true;
+	}
+	public void printUnitInfo() {
+//		scv 정보 출력 메소드
+		System.out.println(UNIT_NAME+" Info HP" + HP + " POWER" + POWER + " DEFENSE"+ DEFENSE + " POPULATION" + POPULATION);
+	}
+	public void printUnitPopulation() {
+//		scv 개수 출력 메소드
+		System.out.println(UNIT_NAME+"총"+ count);
+	}
 }
 
+
+class Marine extends Unit{
+//	유닛을 상속받은 클래스
+	public static final String UNIT_NAME = "Marine";
+	public static final int HP = 40;
+	public static final int POWER = 6;
+	public static final int DEFENSE = 0;
+	public static final int POPULATION = 1;
+//	마린 정보
+	public static int count = 0;
+//	마린 개수
+	public boolean killUnit() {
+//		유닛 삭제 메소드
+		if(count == 0) {
+//			마린이 없을 때
+			System.out.println("삭제할"+UNIT_NAME+"가(이) 유닛이 없습니다.");
+			return false;
+		}
+		count--;
+//		마린 개수 줄여줌
+		BuildingInformation.addCurrentPopulation(-POPULATION);
+//		유닛의 인구수 만큼 인구수를 줄여줌
+		System.out.println(UNIT_NAME+"가(이) 죽었습니다.");
+		return true;
+	}
+	public void printUnitInfo() {
+//		마린 정보 출력 메소드
+		System.out.println(UNIT_NAME+" Info HP" + HP + " POWER" + POWER + " DEFENSE"+ DEFENSE + " POPULATION" + POPULATION);
+	}
+	public void printUnitPopulation() {
+//		마린 개수 출력 메소드
+		System.out.println(UNIT_NAME+"총"+ count);
+	}
+}
+
+class Firebat extends Unit{
+//	유닛을 상속 받은 클래스
+	public static final String UNIT_NAME = "Firebat";
+	public static final int HP = 50;
+	public static final int POWER = 8;
+	public static final int DEFENSE = 1;
+	public static final int POPULATION = 1;
+//	파이어벳 정보
+	public static int count = 0;
+//	파이어벳 개수
+	public boolean killUnit() {
+//		유닛 삭제 메소드
+		if(count == 0) {
+//			파이어벳이 없을 때
+			System.out.println("삭제할"+UNIT_NAME+"가(이) 유닛이 없습니다.");
+			return false;
+		}
+		count--;
+//		파이어벳 개수 줄여줌
+		BuildingInformation.addCurrentPopulation(-POPULATION);
+//		파이어벳 인구수 만큼  인구수 줄여줌
+		System.out.println(UNIT_NAME+"가(이) 죽었습니다.");
+		return true;
+	}
+	public void printUnitInfo() {
+//		파이어벳 정보 출력 메소드
+		System.out.println(UNIT_NAME+" Info HP" + HP + " POWER" + POWER + " DEFENSE"+ DEFENSE + " POPULATION" + POPULATION);
+	}
+	public void printUnitPopulation() {
+//		파이어벳 개수 출력 메소드
+		System.out.println(UNIT_NAME+"총"+ count);
+	}
+}
+
+class Medic extends Unit{
+//	유닛을 상속 받은 클래스
+	public static final String UNIT_NAME = "Medic";
+	public static final int HP = 60;
+	public static final int POWER = 0;
+	public static final int DEFENSE = 1;
+	public static final int POPULATION = 1;
+//	메딕 정보
+	public static int count = 0;
+//	메딕 개수
+	public boolean killUnit() {
+//		유닉 삭제 메소드
+		if(count == 0) {
+//			메딕이 없을 때
+			System.out.println("삭제할"+UNIT_NAME+"가(이) 유닛이 없습니다.");
+			return false;
+		}
+		count--;
+//		메딕 개수 줄여줌
+		BuildingInformation.addCurrentPopulation(-POPULATION);
+//		메딕 인구수 만큼 줄여줌
+		System.out.println(UNIT_NAME+"가(이) 죽었습니다.");
+		return true;
+	}
+	public void printUnitInfo() {
+//		메딕 정보 출력 메소드
+		System.out.println(UNIT_NAME+" Info HP" + HP + " POWER" + POWER + " DEFENSE"+ DEFENSE + " POPULATION" + POPULATION);
+	}
+	public void printUnitPopulation() {
+//		메딕 개수 정보 출력 메소드
+		System.out.println(UNIT_NAME+"총"+ count);
+	}
+}
